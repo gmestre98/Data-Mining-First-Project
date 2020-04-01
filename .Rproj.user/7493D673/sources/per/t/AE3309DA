@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1585759186421.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2670313312",
+    "id" : "AE3309DA",
+    "lastKnownWriteTime" : 1585763324,
+    "last_content_update" : 1585763324144,
+    "path" : "~/Tecnico/MestreMEEC/Mestrado/2 semestre/Modelos Estatísticos em Data Mining/Data-Mining-First-Project/Exploratory_train.R",
+    "project_path" : "Exploratory_train.R",
+    "properties" : {
+        "cursorPosition" : "15,21",
+        "scrollLine" : "9",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
