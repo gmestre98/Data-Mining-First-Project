@@ -2,6 +2,11 @@
 install.packages("DataExplorer")
 install.packages("corrplot")
 install.packages("tidyinftheo")
+if(!require("devtools")) {
+  install.packages("devtools")
+  library("devtools")
+}
+devtools::install_github("mdscheuerell/muti")
 
 # Calling the necessary Libraries
 library(DataExplorer)
@@ -29,7 +34,7 @@ corrplot(corvar, method="color", col = brewer.pal(n = 8, name = "RdBu"), type="l
 # Generating the boxplots
 boxplot(train_data[,23], col=rgb(0.3,0.5,0.4,0.6), las=2, cex.axis=0.70)
 
-#################################Conclusions:
+##########################################Conclusions:#################################################
 # No missing values
 # 2 classes, balanced 6000/6000
 # 6 categorical variables
