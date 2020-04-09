@@ -18,6 +18,14 @@ library(corrplot)
 library(RColorBrewer)
 library(tidyinftheo)
 library("muti")
+#install.packages("reticulate")
+library(reticulate)
+use_python("/usr/local/bin/python")
+#py_install("scikit-learn")
+sklearn1 <- import("sklearn.feature_selection")
+sklearn2 <- import("sklearn.preprocessing")
+
+
 
 # Loading data
 options(warn = FALSE)
@@ -44,16 +52,24 @@ options(warn = TRUE)
 # Checking the data
 head(train_data)
 
-# Descriptive Statistics
+# Cleaning the data
+train_data[,1] <- as.factor(as.numeric(train_data[,1]) - 1)
+train_data[,2] <- as.factor(as.numeric(train_data[,2]) - 1)
+train_data[,3] <- as.factor(as.numeric(train_data[,3]) - 1)
+train_data[,4] <- as.factor(as.numeric(train_data[,4]) - 1)
+train_data[,5] <- as.factor(as.numeric(train_data[,5]) - 1)
+train_data[,6] <- as.factor(as.numeric(train_data[,6]) - 1)
+train_data[,37] <- as.factor(as.numeric(train_data[,37]) - 1)
 
-v <-sapply(train_data[7:36], var)
-m <-sapply(train_data[7:36], mean)
-q <-sapply(train_data[7:36], quantile)
-m0 <- sapply(train_data[7:36], min)
-m1 <- sapply(train_data[7:36], max)
-i <-sapply(train_data[7:36], IQR)
-s <-sapply(train_data[7:36], skewness)
-k <-sapply(train_data[7:36], kurtosis)
+# Descriptive Statistics
+v <-sapply(train_data[,7:36], var)
+m <-sapply(train_data[,7:36], mean)
+q <-sapply(train_data[,7:36], quantile)
+m0 <- sapply(train_data[,7:36], min)
+m1 <- sapply(train_data[,7:36], max)
+i <-sapply(train_data[,7:36], IQR)
+s <-sapply(train_data[,7:36], skewness)
+k <-sapply(train_data[,7:36], kurtosis)
 
 descriptive <- data.frame("mean" = m, "variance" = v, "minimum" = m0, "Q1" = q[2,], "median" = q[2,], 
                           "Q3" = q[3,], "max" = m1, "IQR" = i, "skewness" = s, "kurtosis" = k)
@@ -68,27 +84,38 @@ if(show){
   write.csv(descriptive, file = paste(path, file, sep = ''))
 }
 
+# Trying some transformations on low variance columns to indetify why it has a low variance
+var(log(train_data[,22]) + 1)
+
+
 # Generating a data report for the data
 create_report(train_data)
 
+
 # Plotting histograms of each variable, and signaling the class for each data
-class1 <- data.frame(V34 = train_data[train_data[37]=='_1_', 16])
-class0 <- data.frame(V34 = train_data[train_data[37]=='_0_', 16])
+i=8
+class1 <- data.frame(V = train_data[train_data[37]=='2', i])
+class0 <- data.frame(V = train_data[train_data[37]=='1', i])
 class1$Class <- 'Class 1'
 class0$Class <- 'Class 0'
 classCounts <- rbind(class1, class0)
-ggplot(classCounts, aes(V34, fill = Class)) + 
+ggplot(classCounts, aes(V, fill = Class)) + 
   geom_histogram(alpha = 0.5, aes(y = ..count..), position = 'identity', bins = 100)
+
 
 # Computing the correlations and plotting the correlogram
 corvar <- cor(train_data[7:36])
 corrplot(corvar, method="color", col = brewer.pal(n = 8, name = "RdBu"), type="lower", tl.col = "black",
          addCoef.col = "black", tl.srt = 15, tl.cex = 0.6, number.cex = 0.7)
 
-# Computing the Mutual Information between each variable
-mutinf <- mutual_info_matrix(train_data, 1:37, normalized=TRUE)
-mutual_info_heatmap(mutinf, font_sizes = c(12,12))
-mutinf$MI
+# Computing the mutual information using python
+mtrain_data <- as.matrix(train_data, dimnames=NULL)
+mutinf <- sklearn1$mutual_info_classif(mtrain_data, mtrain_data[,37])
+
+# If we only want to source some script of python
+#source_python('add.py')
+
+
 
 # Visualizing Box plots for each variable
 for (i in 7:36){
@@ -104,29 +131,14 @@ boxplot(plotti, col=rgb(0.3,0.5,0.4,0.6),las=1, ylim = c(0, 400),cex.axis=0.70)
 
 
 #########################################Doubts:######################################################
-#1. Juntamos os valores nas variaveis categoricas que têm valores que correspondam a apenas uma das classes?
+#1. Juntamos os valores nas variaveis categoricas que têm valores que correspondam a apenas uma das classes? Sim, mas explicar
 #2. Ver variáveis que assinalamos
-#3. Problemas das variâncias minorcas
-#4. Correlograma- threshold para tirar
-#5. Mutual Information, nao esta a funcionar, usamos outra metrica? Como corrigir?
-#6. Deteção de outliers
+#3. Problemas das variâncias minorcas, fazer transformaçoes com o logaritmo ou assim
+#4. Correlograma- threshold para tirar R:0.75
+#5. Mutual Information, nao esta a funcionar, usamos outra metrica? Como corrigir? R: A prof vai mandar um pacote
+#6. Deteção de outliers R: Deixar para o fim, ver com os boxplots
 #7. Transformações, pedir ajuda ao dealer do Rui
-
-
-
-
-
-
-
-
-
-
-##########################################Conclusions:#################################################
-# No missing values
-# 2 classes, balanced 6000/6000
-# 6 categorical variables
-# 30 numerical variables
-
+#8. Pre-processar os dados
 
 
 
@@ -138,4 +150,11 @@ boxplot(plotti, col=rgb(0.3,0.5,0.4,0.6),las=1, ylim = c(0, 400),cex.axis=0.70)
 #plot_intro(train_data)
 #plot_missing(train_data)
 #plot_bar(train_data)
+
+# Computing the Mutual Information between each variable
+#mutinf <- mutual_info_matrix(train_data, 1,2,37, normalized=TRUE)
+#mutual_info_heatmap(mutinf, font_sizes = c(12,12))
+#mutinf$MI
+
+#muti(train_data[,12], train_data[,14])
 
