@@ -18,6 +18,7 @@ library(corrplot)
 library(RColorBrewer)
 library(tidyinftheo)
 library("muti")
+library(mRMRe)
 #install.packages("reticulate")
 library(reticulate)
 use_python("/usr/local/bin/python")
@@ -59,7 +60,32 @@ train_data[,3] <- as.factor(as.numeric(train_data[,3]) - 1)
 train_data[,4] <- as.factor(as.numeric(train_data[,4]) - 1)
 train_data[,5] <- as.factor(as.numeric(train_data[,5]) - 1)
 train_data[,6] <- as.factor(as.numeric(train_data[,6]) - 1)
-train_data[,37] <- as.factor(as.numeric(train_data[,37]) - 1)
+aux <- as.factor(as.numeric(train_data[,37]) - 1)
+train_data[,37] <- aux
+write.table(train_data, file="train_data_orig", append = FALSE, sep = " ", dec = ".",
+            row.names = FALSE, col.names = FALSE)
+
+# Adding some extra features as transformations of the existing ones
+train_data[,37] <- train_data[,11]^2 + train_data[,13]^2
+train_data[,38] <- 5*(train_data[,13]- mean(train_data[,13]))^2 + (train_data[,33]- mean(train_data[,33]))^2
+train_data[,39] <- (train_data[,19]- mean(train_data[,19]))^2 + (train_data[,33]- mean(train_data[,33]))^2
+train_data[,40] <- (train_data[,31]- mean(train_data[,31]))^2 + (train_data[,27]- mean(train_data[,27]))^2
+train_data[,41] <- (train_data[,27]- mean(train_data[,27]))^2 + (train_data[,33]- mean(train_data[,33]))^2
+train_data[,42] <- (train_data[,21]- mean(train_data[,21]))^2 + (train_data[,16]- mean(train_data[,16]))^2
+train_data[,43] <- (train_data[,21]- mean(train_data[,21]))^2 + (train_data[,19]- mean(train_data[,19]))^2
+train_data[,44] <- (train_data[,33]- mean(train_data[,33]))^2 + (train_data[,11]- mean(train_data[,11]))^2
+train_data[,45] <- (train_data[,19]- mean(train_data[,19]))^2 + (train_data[,31]- mean(train_data[,31]))^2
+train_data[,46] <- 1000*(train_data[,31]- mean(train_data[,31]))^2 + (train_data[,21]- mean(train_data[,21]))^2
+train_data[,47] <- (train_data[,25]- mean(train_data[,25]))^2 + (train_data[,27]- mean(train_data[,27]))^2
+train_data[,48] <- (train_data[,13]- mean(train_data[,13]))^2 + (train_data[,27]- mean(train_data[,27]))^2
+train_data[,49] <- (train_data[,33]- mean(train_data[,33]))^2 + (train_data[,25]- mean(train_data[,25]))^2
+train_data[,50] <- (train_data[,33]- mean(train_data[,33]))^2 + (train_data[,21]- mean(train_data[,21]))^2
+train_data[,51] <- aux
+# Saving the dataset
+write.table(train_data, file="train_data_new", append = FALSE, sep = " ", dec = ".",
+            row.names = FALSE, col.names = FALSE)
+
+
 
 # Descriptive Statistics
 v <-sapply(train_data[,7:36], var)
@@ -104,7 +130,7 @@ ggplot(classCounts, aes(V, fill = Class)) +
 
 
 # Computing the correlations and plotting the correlogram
-corvar <- cor(train_data[7:36])
+corvar <- cor(train_data[7:50])
 corrplot(corvar, method="color", col = brewer.pal(n = 8, name = "RdBu"), type="lower", tl.col = "black",
          addCoef.col = "black", tl.srt = 15, tl.cex = 0.6, number.cex = 0.7)
 
@@ -114,6 +140,34 @@ mutinf <- sklearn1$mutual_info_classif(mtrain_data, mtrain_data[,37])
 
 # If we only want to source some script of python
 #source_python('add.py')
+
+train_data[,1] <- as.ordered(train_data[,1])
+train_data[,2] <- as.ordered(train_data[,2])
+train_data[,3] <- as.ordered(train_data[,3])
+train_data[,4] <- as.ordered(train_data[,4])
+train_data[,5] <- as.ordered(train_data[,5])
+train_data[,6] <- as.ordered(train_data[,6])
+train_data[,51] <- as.ordered(train_data[,51])
+
+#Transform into an MRMR Dataset
+train_mrmr = mRMR.data(train_data)
+
+#MRMR Algorithm
+feat_sel = mRMR.classic(data = train_mrmr, target_indices = 51, feature_count = 50)
+feat_sel@filters
+#feat_sel@scores
+#solutions(feat_sel)
+
+train_data_removed <- train_data[,c(1:2,4:10,14:21,24:25,27:28,30,32,36,39,43,37)]
+write.table(train_data_removed, file="train_data_removed", append = FALSE, sep = " ", dec = ".",
+            row.names = FALSE, col.names = FALSE)
+
+corvar <- cor(train_data_removed[6:26])
+corrplot(corvar, method="color", col = brewer.pal(n = 8, name = "RdBu"), type="lower", tl.col = "black",
+         addCoef.col = "black", tl.srt = 15, tl.cex = 0.6, number.cex = 0.7)
+
+
+
 
 
 
