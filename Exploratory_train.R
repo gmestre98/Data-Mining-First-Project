@@ -129,7 +129,7 @@ ggplot(classCounts, aes(V, fill = Class)) +
   geom_histogram(alpha = 0.5, aes(y = ..count..), position = 'identity', bins = 100)
 
 
-# Computing the correlations and plotting the correlogram
+# Computingd the correlations and plotting the correlogram
 corvar <- cor(train_data[7:50])
 corrplot(corvar, method="color", col = brewer.pal(n = 8, name = "RdBu"), type="lower", tl.col = "black",
          addCoef.col = "black", tl.srt = 15, tl.cex = 0.6, number.cex = 0.7)
