@@ -41,11 +41,11 @@ if (class(train_data) == "try-error") {
               row.names = FALSE, col.names = FALSE)
 }
 test_data <- try(read.table("Input/client_test_marked.txt"))
-if (class(train_data) == "try-error") {
+if (class(test_data) == "try-error") {
   file = "client_test_marked.txt"
   print("Downloading the data instead.")
-  train_data <- read.table("http://web.tecnico.ulisboa.pt/~ist13493/MEDM2020/Project1/Group3Data/client_test_marked.txt")
-  write.table(train_data, file=paste(folder, file, sep=''), append = FALSE, sep = " ", dec = ".",
+  test_data <- read.table("http://web.tecnico.ulisboa.pt/~ist13493/MEDM2020/Project1/Group3Data/client_test_marked.txt")
+  write.table(test_data, file=paste(folder, file, sep=''), append = FALSE, sep = " ", dec = ".",
               row.names = FALSE, col.names = FALSE)
 }
 options(warn = TRUE)
@@ -165,9 +165,23 @@ corrplot(corvar, method="color", col = brewer.pal(n = 8, name = "RdBu"), type="l
 
 
 
-
-
-
+# Cleaning the data
+test_data[,1] <- as.factor(as.numeric(test_data[,1]) - 1)
+test_data[,2] <- as.factor(as.numeric(test_data[,2]) - 1)
+test_data[,3] <- as.factor(as.numeric(test_data[,3]) - 1)
+test_data[,4] <- as.factor(as.numeric(test_data[,4]) - 1)
+test_data[,5] <- as.factor(as.numeric(test_data[,5]) - 1)
+test_data[,6] <- as.factor(as.numeric(test_data[,6]) - 1)
+aux <- as.factor(as.numeric(test_data[,37]) - 1)
+test_data[,37] <- aux
+write.table(test_data, file="test_data_orig", append = FALSE, sep = " ", dec = ".",
+            row.names = FALSE, col.names = FALSE)
+test_data[,37] <- (test_data[,19]- mean(test_data[,19]))^2 + (test_data[,33]- mean(test_data[,33]))^2
+test_data[,38] <- (test_data[,21]- mean(test_data[,21]))^2 + (test_data[,19]- mean(test_data[,19]))^2
+test_data[,39] <- aux
+test_data_removed <- test_data[,c(1:2,4:10,14:21,24:25,27:28,30,32,36:39)]
+write.table(train_data_removed, file="test_data_removed", append = FALSE, sep = " ", dec = ".",
+            row.names = FALSE, col.names = FALSE)
 
 
 
