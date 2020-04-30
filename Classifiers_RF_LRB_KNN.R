@@ -83,10 +83,17 @@ x_test5<-dataset.pca.test2[,1:23] # 23 first columns are the features
 
 ########## HOW TO RUN IT: ###########
 
-# For each method, its necessary to replace the "method" and the tuning paramt. by replacing:
-## knn:                         "kknn"           - tuning paramt: kmax, kernel, distance
-## Random Forest:               "rf"             -tuning paramt: mtry
-## Logistic Regression boosted: "LogitBoost"     - tuning paramt:nIter
+# For each classifier, its necessary to replace the "method" and the tuning paramt. by replacing:
+## knn: "kknn"
+#  tuning paramt: kmax = seq(1, 25, 2), distance=1:2, kernel=c("optimal","rectangular","gaussian")
+
+## Random Forest: "rf"             - 
+# tuning paramt: mtry = 1:20
+
+## Logistic Regression boosted: "LogitBoost"     - 
+# tuning paramt: nIter = seq(1, 25, 2)
+
+# Its necessary to replace the datasets as well
 
 # The datasets:             X train |  X test | Y train | Y test
 #                           -------------------------------------
@@ -104,8 +111,8 @@ x_test5<-dataset.pca.test2[,1:23] # 23 first columns are the features
 set.seed(2020)
 #Dados normalizados
 pred.knn.m2 <- train(CL~.,
-                     method     = "knn",
-                     tuneGrid   = expand.grid(k = 1:20),
+                     method     = "kknn",
+                     tuneGrid   = expand.grid(kmax = seq(1, 25, 2), distance=1:2, kernel=c("optimal","rectangular","gaussian")),
                      trControl  = trainControl(method = "repeatedcv", number = 5, repeats = 4),
                      metric     = "Accuracy",
                      data       = cbind(CL = as.factor(y_train), x_train))
@@ -123,8 +130,8 @@ confusionMatrix(fitm2, as.factor(y_test))
 
 # Train the model
 pred.knn.m3 <- train(CL~.,
-                     method     = "knn",
-                     tuneGrid   = expand.grid(k = 1:20),
+                     method     = "kknn",
+                     tuneGrid   = expand.grid(kmax = seq(1, 25, 2), distance=1:2, kernel=c("optimal","rectangular","gaussian")),
                      trControl  = trainControl(method="boot", number=100),
                      metric     = "Accuracy", 
                      data       = cbind(CL = as.factor(y_train), x_train))
@@ -145,7 +152,7 @@ confusionMatrix(fitm3, as.factor(y_test))
 # Train the model
 pred.knn.m4 <- train(CL~.,
                      method     = "LogitBoost",
-                     tuneGrid   = expand.grid(nIter = 1:20),
+                     tuneGrid   = expand.grid(nIter = seq(1, 25, 2)),
                      trControl  = trainControl(method = "LOOCV"),
                      metric     = "Accuracy", 
                      data       = cbind(CL = as.factor(y_train), x_train))
@@ -163,10 +170,9 @@ confusionMatrix(fitm4, as.factor(y_test))
 
 ################### K Folds Cross Validation #####################
 
-# 1 Man   2 Euclidian    #optimal", "rectangular", "gaussian", "rbfdot
 pred.knn.m53 <- train(CL~.,
-                     method     = "kknn",
-                     tuneGrid   = expand.grid(kmax = 1:20, distance=1:2, kernel="gaussian"),
+                     method     = "rf",
+                     tuneGrid   = expand.grid(mtry = 1:20),
                      trControl  = trainControl(method = "cv",number = 10),
                      metric     = "Accuracy",
                      data       = cbind(CL = as.factor(y_train), x_train))
