@@ -22,7 +22,7 @@ dataset.pca.train<-read.csv("dataset_pca.csv",header = TRUE)
 dataset.pca.test<-read.csv("dataset_pca_test.csv",header = TRUE)
 
 
-dataset.pca.train2<-read.csv("dataset_processed_pca_test_1.csv",header = TRUE, sep=",")
+dataset.pca.train2<-read.csv("dataset_processed_pca_train_1.csv",header = TRUE, sep=",")
 dataset.pca.test2<-read.csv("dataset_processed_pca_test_1.csv",header = TRUE, sep=",")
 
 dataset.pca.train2$X = NULL
