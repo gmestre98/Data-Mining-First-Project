@@ -107,7 +107,7 @@ var(log(train_data[,22]) + 1)
 
 
 # Plotting histograms of each variable, and signaling the class for each data
-i=15
+i=36
 class1 <- data.frame(v = train_data[train_data[37]=='0', i])
 class0 <- data.frame(v = train_data[train_data[37]=='1', i])
 class1$Class <- 'Class 1'
