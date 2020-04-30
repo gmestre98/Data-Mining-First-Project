@@ -19,14 +19,6 @@ library(RColorBrewer)
 library(tidyinftheo)
 library("muti")
 library(mRMRe)
-#install.packages("reticulate")
-library(reticulate)
-use_python("/usr/local/bin/python")
-#py_install("scikit-learn")
-#py_install("pandas")
-#py_install("seaborn")
-sklearn1 <- import("sklearn.feature_selection")
-
 
 # Loading data
 options(warn = FALSE)
@@ -115,14 +107,26 @@ var(log(train_data[,22]) + 1)
 
 
 # Plotting histograms of each variable, and signaling the class for each data
-i=8
-class1 <- data.frame(V = train_data[train_data[37]=='2', i])
-class0 <- data.frame(V = train_data[train_data[37]=='1', i])
+i=15
+class1 <- data.frame(v = train_data[train_data[37]=='0', i])
+class0 <- data.frame(v = train_data[train_data[37]=='1', i])
 class1$Class <- 'Class 1'
 class0$Class <- 'Class 0'
 classCounts <- rbind(class1, class0)
-ggplot(classCounts, aes(V, fill = Class)) + 
-  geom_histogram(alpha = 0.5, aes(y = ..count..), position = 'identity', bins = 100)
+#Continuous
+ggplot(classCounts, aes(v, fill = Class)) +
+  labs(x = paste("V", i, sep="")) + 
+  geom_histogram(bins=50) + 
+  theme(plot.title = element_text(size = 12, face = "bold"),
+    legend.title=element_text(size=16), 
+    legend.text=element_text(size=14))
+#Discrete
+ggplot(classCounts, aes(v, fill = Class)) +
+  labs(x = paste("V", i, sep="")) + 
+  geom_bar() + 
+  theme(plot.title = element_text(size = 12, face = "bold"),
+        legend.title=element_text(size=16), 
+        legend.text=element_text(size=14))
 
 
 # Computingd the correlations and plotting the correlogram
@@ -179,109 +183,6 @@ write.table(test_data, file="test_data_orig", append = FALSE, sep = " ", dec = "
 test_data[,37] <- (test_data[,19]- mean(test_data[,19]))^2 + (test_data[,33]- mean(test_data[,33]))^2
 test_data[,38] <- (test_data[,21]- mean(test_data[,21]))^2 + (test_data[,19]- mean(test_data[,19]))^2
 test_data[,39] <- aux
-test_data_removed <- test_data[,c(1:2,4:10,14:21,24:25,27:28,30,32,36:39)]
+test_data_removed <- test_data[,c(1:10,14:21,24:25,27:28,30,32,36:39)]
 write.table(train_data_removed, file="test_data_removed", append = FALSE, sep = " ", dec = ".",
             row.names = FALSE, col.names = FALSE)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# 
-# 
-# 
-# # Visualizing Box plots for each variable
-# for (i in 7:36){
-#   boxplot(train_data[,12], col=rgb(0.3,0.5,0.4,0.6), las=2, cex.axis=0.70)
-# }
-# plotti <- train_data[c(7:16)]
-# boxplot(plotti, col=rgb(0.3,0.5,0.4,0.6),las=1, ylim = c(0, 400),cex.axis=0.70)
-# plotti <- train_data[c(17:26)]
-# boxplot(plotti, col=rgb(0.3,0.5,0.4,0.6),las=1, ylim = c(0, 400),cex.axis=0.70)
-# plotti <- train_data[c(27:36)]
-# boxplot(plotti, col=rgb(0.3,0.5,0.4,0.6),las=1, ylim = c(0, 400),cex.axis=0.70)
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# 
-# #########################################Doubts:######################################################
-# #1. Juntamos os valores nas variaveis categoricas que têm valores que correspondam a apenas uma das classes? Sim, mas explicar
-# #2. Ver variáveis que assinalamos
-# #3. Problemas das variâncias minorcas, fazer transformaçoes com o logaritmo ou assim
-# #4. Correlograma- threshold para tirar R:0.75
-# #5. Mutual Information, nao esta a funcionar, usamos outra metrica? Como corrigir? R: A prof vai mandar um pacote
-# #6. Deteção de outliers R: Deixar para o fim, ver com os boxplots
-# #7. Transformações, pedir ajuda ao dealer do Rui
-# #8. Pre-processar os dados
-# 
-# 
-# 
-# 
-# ##########################################Extra code pieces if needed in future########################
-# # Checking some information on the data
-# #plot_str(train_data)
-# #introduce(train_data)
-# #plot_intro(train_data)
-# #plot_missing(train_data)
-# #plot_bar(train_data)
-# 
-# # Computing the Mutual Information between each variable
-# #mutinf <- mutual_info_matrix(train_data, 1,2,37, normalized=TRUE)
-# #mutual_info_heatmap(mutinf, font_sizes = c(12,12))
-# #mutinf$MI
-# 
-# #muti(train_data[,12], train_data[,14])
-# 
